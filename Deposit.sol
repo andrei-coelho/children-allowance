@@ -27,6 +27,10 @@ contract Deposit {
 
     mapping (uint => Account) accounts;
 
+    function getLastAccount() view internal returns(uint) {
+        return account_index;
+    }
+
     function createAccount(address _endorser, address _children, uint _limit) internal {
         
         Children memory children = Children(_children, _limit, 0);
@@ -52,6 +56,7 @@ contract Deposit {
         if( children.wallet == _who 
             && children.limit >= _value 
             && children.next_withdraw_in < block.timestamp){
+
             account.chindren.next_withdraw_in += 30 days;
             return true;
         }
