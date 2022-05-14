@@ -19,8 +19,9 @@ contract Deposit {
 
     struct Account {
         Endorser endorser;
-        Children chindren;
+        Children children;
         uint amount;
+        uint limit;
     }
 
     uint account_index = 0;
@@ -33,9 +34,9 @@ contract Deposit {
 
     function createAccount(address _endorser, address _children, uint _limit) internal {
         
-        Children memory children = Children(_children, _limit, 0);
+        Children memory children = Children(_children, _limit, block.timestamp + 30 days);
         Endorser memory endorser = Endorser(_endorser);
-        Account  memory account  = Account(endorser, children, 0);
+        Account  memory account  = Account(endorser, children, 0, _limit);
 
         account_index++;
         accounts[account_index] = account;
@@ -51,13 +52,21 @@ contract Deposit {
         Account  storage account  = accounts[_account];
         require(_value <= account.amount);
 
-        Children memory  children = account.chindren;
+        Children storage children = account.children;
         
-        if( children.wallet == _who 
-            && children.limit >= _value 
-            && children.next_withdraw_in < block.timestamp){
+        if( children.wallet == _who ){
+            
+            if(children.next_withdraw_in < block.timestamp){
+                account.children.next_withdraw_in += 30 days;
+                children.limit = children.limit.add(account.limit);
+            }
 
-            account.chindren.next_withdraw_in += 30 days;
+            if(children.limit < _value){
+                return false;
+            }
+
+            children.limit = children.limit.sub(_value);
+            account.amount = account.amount.sub(_value);
             return true;
         }
         

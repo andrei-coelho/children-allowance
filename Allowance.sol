@@ -27,4 +27,12 @@ contract Allowance is Deposit {
     
     }
 
+    function getLimitMonth(uint _account) view public returns(uint) {
+        return accounts[_account].children.limit;
+    }
+
+    function accountAmount(uint _account) view public returns(uint) {
+        return accounts[_account].amount;
+    }
+
 }
