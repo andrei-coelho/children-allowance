@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import './Deposit.sol';
+import './Bank.sol';
 
-contract Allowance is Deposit {
+contract Allowance is Bank {
 
-    event Created(uint account);
+    event Created(string message, address _endorser, address _children, uint _account);
 
     function create(address _children, uint _limit) payable public {
        
         createAccount(msg.sender, _children, _limit);
-        emit Created(getLastAccount());
+        emit Created('conta_criada', msg.sender,  _children, getLastAccount());
    
     }
 

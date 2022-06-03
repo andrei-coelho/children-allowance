@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import './SafeMath.sol';
 
-contract Deposit {
+contract Bank {
 
     using SafeMath for uint;
 
@@ -49,7 +49,7 @@ contract Deposit {
 
     function withdrawMoney(uint _account, address _who, uint _value) internal returns(bool) {
         
-        Account  storage account  = accounts[_account];
+        Account storage account  = accounts[_account];
         require(_value <= account.amount);
 
         Children storage children = account.children;
