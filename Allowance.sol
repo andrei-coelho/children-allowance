@@ -5,12 +5,14 @@ import './Bank.sol';
 
 contract Allowance is Bank {
 
-    event Created(string message, address _endorser, address _children, uint _account);
+    event Created (address _endorser, address _children, uint _account, uint _limit);
+    event Transfer(address _endorser, uint _account, uint _to_account, uint _value);
+    event Deposit (uint _account, uint _value);
 
     function create(address _children, uint _limit) payable public {
        
         createAccount(msg.sender, _children, _limit);
-        emit Created('conta_criada', msg.sender,  _children, getLastAccount());
+        emit Created(msg.sender,  _children, getLastAccount(), _limit);
    
     }
 

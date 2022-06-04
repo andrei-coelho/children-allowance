@@ -7,6 +7,10 @@ contract Bank {
 
     using SafeMath for uint;
 
+    event WithdrawChildren (uint _account, uint _value);
+    event WithdrawChildrenAndRefresh (uint _account, uint _value, uint _timestamp);
+    event WithdrawEndorser (uint _account, uint _value);
+
     struct Children {
         address wallet;
         uint limit;
@@ -52,11 +56,14 @@ contract Bank {
         Account storage account  = accounts[_account];
         require(_value <= account.amount);
 
-        Children storage children = account.children;
-        
+        Children storage children = account.children; 
+
         if( children.wallet == _who ){
             
+            bool refresh = false;
+
             if(children.next_withdraw_in < block.timestamp){
+                refresh = true;
                 account.children.next_withdraw_in += 30 days;
                 children.limit = children.limit.add(account.limit);
             }
@@ -67,11 +74,19 @@ contract Bank {
 
             children.limit = children.limit.sub(_value);
             account.amount = account.amount.sub(_value);
+            
+            if(!refresh){
+                emit WithdrawChildren (_account, _value);
+            } else {
+                emit WithdrawChildrenAndRefresh (_account, _value, account.children.next_withdraw_in);
+            }
+            
             return true;
         }
         
         if(account.endorser.wallet == _who){
             account.amount = account.amount.sub(_value);
+            emit WithdrawEndorser (_account,  _value);
             return true;
         }
 
